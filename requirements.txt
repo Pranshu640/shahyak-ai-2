@@ -1,0 +1,14 @@
+flask==2.3.3
+flask-cors==4.0.0
+werkzeug==2.3.7
+groq
+pydub
+SpeechRecognition
+pygame
+gTTS
+elevenlabs
+pybase64
+TIME-python
+python-dotenv
+transformers==4.34.0
+sentence-transformers==2.2.2
