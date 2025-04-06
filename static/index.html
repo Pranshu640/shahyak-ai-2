@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedTech Consultation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .form-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .response-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            margin-top: 20px;
+        }
+        .chat-history {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: white;
+        }
+        .user-message {
+            background-color: #e1f5fe;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .doctor-message {
+            background-color: #f1f8e9;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .audio-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .hidden {
+            display: none;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,0,0,.3);
+            border-radius: 50%;
+            border-top-color: #3498db;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <h1>MedTech Consultation</h1>
+    
+    <div class="container">
+        <div class="form-section">
+            <h2>Patient Information</h2>
+            <form id="consultationForm">
+                <div class="form-group">
+                    <label for="age">Age:</label>
+                    <input type="number" id="age" name="age" min="0" max="120">
+                </div>
+                
+                <div class="form-group">
+                    <label for="gender">Gender:</label>
+                    <select id="gender" name="gender">
+                        <option value="">Select gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Common Conditions:</label>
+                    <div class="checkbox-group" id="commonConditions">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="condition1" name="common_conditions" value="Fever">
+                            <label for="condition1">Fever</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="condition2" name="common_conditions" value="Cough">
+                            <label for="condition2">Cough</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="condition3" name="common_conditions" value="Headache">
+                            <label for="condition3">Headache</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="condition4" name="common_conditions" value="Fatigue">
+                            <label for="condition4">Fatigue</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="condition5" name="common_conditions" value="Nausea">
+                            <label for="condition5">Nausea</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="otherCondition">Other Condition:</label>
+                    <input type="text" id="otherCondition" name="other_condition">
+                </div>
+                
+                <div class="form-group">
+                    <label for="issueType">Issue Type:</label>
+                    <select id="issueType" name="issue_type">
+                        <option value="">Select issue type</option>
+                        <option value="Acute">Acute (Sudden onset)</option>
+                        <option value="Chronic">Chronic (Long-term)</option>
+                        <option value="Recurring">Recurring</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="specificIssue">Specific Issue:</label>
+                    <textarea id="specificIssue" name="specific_issue" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="textQuery">Text Query:</label>
+                    <textarea id="textQuery" name="query" rows="3" placeholder="Describe your symptoms or ask a question..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="imageUpload">Upload Medical Image:</label>
+                    <input type="file" id="imageUpload" name="image" accept="image/*">
+                </div>
+                
+                <div class="form-group">
+                    <label>Voice Input:</label>
+                    <div class="audio-controls">
+                        <button type="button" id="startRecording">Start Recording</button>
+                        <button type="button" id="stopRecording" disabled>Stop Recording</button>
+                        <span id="recordingStatus"></span>
+                    </div>
+                    <audio id="audioPlayback" controls class="hidden"></audio>
+                </div>
+                
+                <button type="submit" id="submitBtn">Submit Consultation</button>
+            </form>
+        </div>
+        
+        <div class="response-section">
+            <h2>Doctor's Response</h2>
+            <div id="responseText"></div>
+            <div id="audioResponse" class="hidden">
+                <h3>Audio Response</h3>
+                <audio id="doctorAudio" controls></audio>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h2>Chat History</h2>
+            <div class="chat-history" id="chatHistory"></div>
+            <button type="button" id="clearChatBtn">Clear Chat History</button>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioBlob;
+
+        // DOM elements
+        const startRecordingBtn = document.getElementById('startRecording');
+        const stopRecordingBtn = document.getElementById('stopRecording');
+        const recordingStatus = document.getElementById('recordingStatus');
+        const audioPlayback = document.getElementById('audioPlayback');
+        const consultationForm = document.getElementById('consultationForm');
+        const responseText = document.getElementById('responseText');
+        const audioResponse = document.getElementById('audioResponse');
+        const doctorAudio = document.getElementById('doctorAudio');
+        const chatHistory = document.getElementById('chatHistory');
+        const clearChatBtn = document.getElementById('clearChatBtn');
+
+        // Start audio recording
+        startRecordingBtn.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = () => {
+                    audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    audioPlayback.src = audioUrl;
+                    audioPlayback.classList.remove('hidden');
+                    recordingStatus.textContent = 'Recording saved';
+                };
+                
+                mediaRecorder.start();
+                startRecordingBtn.disabled = true;
+                stopRecordingBtn.disabled = false;
+                recordingStatus.textContent = 'Recording...';
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                recordingStatus.textContent = 'Error: ' + error.message;
+            }
+        });
+
+        // Stop audio recording
+        stopRecordingBtn.addEventListener('click', () => {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                startRecordingBtn.disabled = false;
+                stopRecordingBtn.disabled = true;
+            }
+        });
+
+        // Load chat history on page load
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadChatHistory();
+        });
+
+        // Load chat history from server
+        async function loadChatHistory() {
+            try {
+                const response = await fetch('http://localhost:8000/api/chat-history');
+                const data = await response.json();
+                
+                chatHistory.innerHTML = '';
+                data.history.forEach(message => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = message.role === 'user' ? 'user-message' : 'doctor-message';
+                    messageDiv.textContent = message.content;
+                    chatHistory.appendChild(messageDiv);
+                });
+                
+                // Scroll to bottom of chat history
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            } catch (error) {
+                console.error('Error loading chat history:', error);
+            }
+        }
+
+        // Clear chat history
+        clearChatBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('http://localhost:8000/api/clear-chat', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    chatHistory.innerHTML = '';
+                }
+            } catch (error) {
+                console.error('Error clearing chat history:', error);
+            }
+        });
+
+        // Submit consultation form
+        consultationForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            // Show loading indicator
+            responseText.innerHTML = '<div class="loading"></div> Processing your consultation...';
+            audioResponse.classList.add('hidden');
+            
+            // Create FormData object
+            const formData = new FormData(consultationForm);
+            
+            // Get selected common conditions
+            const commonConditions = [];
+            document.querySelectorAll('input[name="common_conditions"]:checked').forEach(checkbox => {
+                commonConditions.push(checkbox.value);
+            });
+            
+            // Create patient info object
+            const patientInfo = {
+                age: formData.get('age'),
+                gender: formData.get('gender'),
+                common_conditions: commonConditions,
+                other_condition: formData.get('other_condition'),
+                issue_type: formData.get('issue_type'),
+                specific_issue: formData.get('specific_issue'),
+                text_query: formData.get('query')
+            };
+            
+            // Add patient info to FormData
+            formData.set('patientInfo', JSON.stringify(patientInfo));
+            
+            // Add audio recording if available
+            if (audioBlob) {
+                formData.set('audio', audioBlob, 'recording.wav');
+            }
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/consultation', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Display doctor's response
+                    responseText.textContent = data.doctor_response;
+                    
+                    // Handle audio response if available
+                    if (data.audio_data) {
+                        const audioSrc = 'data:audio/mp3;base64,' + data.audio_data;
+                        doctorAudio.src = audioSrc;
+                        audioResponse.classList.remove('hidden');
+                    }
+                    
+                    // Refresh chat history
+                    await loadChatHistory();
+                } else {
+                    responseText.textContent = data.error || 'An error occurred during consultation';
+                }
+            } catch (error) {
+                console.error('Error submitting consultation:', error);
+                responseText.textContent = 'Error: ' + error.message;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -18,7 +18,7 @@ from brain_of_the_doctor import encode_image, generate_doctor_response_text, ana
 from voice_of_the_patient import record_audio, transcribe_with_groq
 from voice_of_the_doctor import text_to_speech_with_elevenlabs
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static', static_folder='static')
 CORS(app)  # Enable CORS for all routes
 
 # Constants
